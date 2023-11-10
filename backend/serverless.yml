@@ -1,7 +1,8 @@
 # TODO: Change the name of the org 
-org: sudkul
-app: serverless-todo-app
-service: serverless-todo-app
+org: anhnongdann
+app: serverless-todo-app-1
+service: serverless-todo-app-1
+frameworkVersion: '2.21.1'
 
 plugins:
   - serverless-webpack
