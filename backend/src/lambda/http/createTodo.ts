@@ -21,6 +21,7 @@ export const handler = middy(
     }
 
     //return undefined
+  }
 )
 
 handler.use(

@@ -5,14 +5,14 @@ const XAWS = AWSXRay.captureAWS(AWS)
 
 // TODO: Implement the fileStogare logic
 
-const s3BucketName = process.env.ATTACHMENTS_S3_BUCKET
+const s3BucketName = process.env.ATTACHMENT_S3_BUCKET
 const urlExpire = process.env.SIGNED_URL_EXPIRATION
 
 
 export class AttachmentUtils{
     constructor(
         private readonly s3 = new XAWS.S3({signatureVersion: 'v4'}),
-        private readonly bucketName = s3BucketName
+        private readonly bucketName = s3BucketName,
         private readonly todosTable = process.env.TODOS_TABLE,
         private readonly docClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly indexName = process.env.INDEX_NAME,

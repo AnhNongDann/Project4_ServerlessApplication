@@ -35,8 +35,8 @@ export class TodosAccess {
         return items as TodoItem[]
     }
 
-    async createTodo(todoItem: TodoItem): Promise<TodoItem> {
-        logger.info('Create todo')
+    async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
+        logger.info('Create todo item function called   ')
 
         const result = await this.docClient
             .put({
