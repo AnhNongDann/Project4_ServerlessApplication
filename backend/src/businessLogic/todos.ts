@@ -5,10 +5,6 @@ import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
-import * as createError from 'http-errors'
-import { TodoUpdate } from '../models/TodoUpdate';
-import { promises } from 'dns';
-
 // TODO: Implement businessLogic
 
 // get todo 
@@ -27,17 +23,19 @@ const attachmentUtils = new AttachmentUtils();
 
 export async function createTodo(newTodo: CreateTodoRequest, userId: string): Promise<TodoItem> {
 
+    logger.info('start create function')
+
     const todoId = uuid.v4();
-    const createAt = new Date().toISOString();
     const s3AttachId = attachmentUtils.getAttachmentUrl(todoId)
 
     return await todosAcess.createTodoItem({
         todoId: todoId,
         userId: userId,
-        done: true,
+        done: false,
         name: newTodo.name,
         dueDate: newTodo.dueDate,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        attachmentUrl: s3AttachId
       })
 }
 
@@ -47,7 +45,7 @@ export async function updateTodo(todoId:string, userId:string, todoUpdate: Updat
 
     return await todosAcess.updateTodo(todoUpdate, todoId, userId);
 }
-
+ 
 // write delete todo function
 
 export async function deleteTodo(userId: string, todoId: string):Promise<string> {
@@ -59,7 +57,7 @@ export async function deleteTodo(userId: string, todoId: string):Promise<string>
 
 //write create attachment function
 
-export async function createAttachmentPresignedUrl(userId:string, todoId: string):Promise<string> {
+export async function createAttachmentPresignedUrl(todoId: string):Promise<string> {
 
     logger.info('create attachment function called')
 

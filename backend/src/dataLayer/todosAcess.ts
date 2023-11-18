@@ -1,6 +1,5 @@
 import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
-import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+const AWSXRay = require('aws-xray-sdk');
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
@@ -20,7 +19,7 @@ export class TodosAccess {
     ) { }
 
     async getAllTodos(userId: string): Promise<TodoItem[]> {
-
+        logger.info('start get all todos function')
 
         const result = await this.docClient.query({
             TableName: this.todosTable,
@@ -36,7 +35,7 @@ export class TodosAccess {
     }
 
     async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
-        logger.info('Create todo item function called   ')
+        logger.info('start Create todo item function called')
 
         const result = await this.docClient
             .put({
@@ -44,6 +43,8 @@ export class TodosAccess {
                 Item: todoItem
             })
             .promise()
+
+        logger.info('todo item create result ', result)
         return todoItem as TodoItem
     }
 
@@ -107,16 +108,4 @@ export class TodosAccess {
         logger.info(result)
         return 'Update attachmentUrl successfully'
     }
-}
-
-function createDynamoDBClient() {
-    if (process.env.IS_OFFLINE) {
-        logger.info('Creating a local DynamoDB instance')
-        return new XAWS.DynamoDB.DocumentClient({
-            region: 'localhost',
-            endpoint: 'http://localhost:8000'
-        })
-    }
-
-    return new XAWS.DynamoDB.DocumentClient()
 }

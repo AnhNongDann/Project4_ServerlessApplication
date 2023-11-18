@@ -1,8 +1,6 @@
 # TODO: Change the name of the org
-org: trung10052014
-app: serverless-todo-app-1
-service: serverless-todo-app-1
-frameworkVersion: '2.21.1'
+app: serverless-todo-app-2
+service: serverless-todo-app-2
 
 plugins:
   - serverless-webpack
@@ -11,7 +9,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   lambdaHashingVersion: '20201221'
 
   stage: ${opt:stage, 'dev'}
@@ -24,11 +22,11 @@ provider:
   # Use these variables in the functions and resouorces section below. For example,
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
-    TODOS_TABLE: serverless-todo-app-1-${self:provider.stage}
+    TODOS_TABLE: serverless-todo-app-2-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-todo-app-1-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: serverless-todo-app-2-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    PROJECT_NAME: serverless-todo-app-1
+    PROJECT_NAME: serverless-todo-app-2
     INDEX_NAME: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
 
   logs:
@@ -114,7 +112,7 @@ functions:
           method: post
           path: todos
           cors: true
-          authorizer: Auth
+          # authorizer: Auth
           # request:
           #   schemas:
           #     application/json: ${file(models/create-todo-model.json)}
@@ -128,11 +126,11 @@ functions:
     iamRoleStatements: 
       - Effect: Allow
         Action:   
-        - dynamodb:PutItem
+          - dynamodb:PutItem
         Resource: arn:aws:dynamo:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action: 
-          - xray: PutTraceSegments
+          - xray:PutTraceSegments
         Resource: 
           - '*'
   # TODO: Configure this function
