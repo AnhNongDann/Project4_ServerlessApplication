@@ -23,7 +23,7 @@ const attachmentUtils = new AttachmentUtils();
 
 export async function createTodo(newTodo: CreateTodoRequest, userId: string): Promise<TodoItem> {
 
-    logger.info('start create function')
+    logger.info('start create function', newTodo, userId)
 
     const todoId = uuid.v4();
     const s3AttachId = attachmentUtils.getAttachmentUrl(todoId)
