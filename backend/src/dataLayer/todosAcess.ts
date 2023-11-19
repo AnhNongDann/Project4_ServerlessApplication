@@ -112,4 +112,23 @@ export class TodosAccess {
         logger.info(result)
         return 'Update attachmentUrl successfully'
     }
+
+    async searchTodos(userId: string, keyword: string): Promise<TodoItem[]> {
+        const result = await this.docClient
+        .query({
+          TableName: this.todosTable,
+          KeyConditionExpression: '#userId =ui',
+          ExpressionAttributeNames: {
+            '#userId': 'userId'
+          },
+          ExpressionAttributeValues: {
+            ':ui': userId
+          }
+        })
+        .promise();
+  
+      let items = result.Items;
+      items = items.filter((item) => item.name.includes(keyword));
+      return items as TodoItem[];
+      }
 }

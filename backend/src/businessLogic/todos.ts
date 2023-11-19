@@ -67,3 +67,12 @@ export async function createAttachmentPresignedUrl(todoId: string, userId: strin
     return url;
     
 }
+
+
+// write search function 
+export async function searchTodos(
+    userId: string,
+    keyword: string
+  ): Promise<TodoItem[]> {
+    return todosAcess.searchTodos(userId, keyword);
+  }
