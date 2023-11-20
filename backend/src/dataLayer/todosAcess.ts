@@ -114,7 +114,20 @@ export class TodosAccess {
     }
 
     async searchTodos(userId: string, keyword: string): Promise<TodoItem[]> {
-        let items = await this.getAllTodos(userId)
+    const result = await this.docClient
+        .query({
+        TableName: this.todosTable,
+        KeyConditionExpression: '#userId =:i',
+        ExpressionAttributeNames: {
+          '#userId': 'userId'
+        },
+        ExpressionAttributeValues: {
+          ':i': userId
+        }
+      })
+      .promise();
+
+    let items = result.Items;
 
         items = items.filter((item) => item.name.includes(keyword));
         return items as TodoItem[];

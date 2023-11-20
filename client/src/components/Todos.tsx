@@ -14,9 +14,17 @@ import {
   Loader
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import {
+  createTodo,
+  deleteTodo,
+  getTodos,
+  patchTodo,
+  searchTodos
+} from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
+
+import { SearchTodoRequest } from '../types/SearchTodoRequest'
 
 interface TodosProps {
   auth: Auth
@@ -27,17 +35,23 @@ interface TodosState {
   todos: Todo[]
   newTodoName: string
   loadingTodos: boolean
+  searchTodo: string
 }
 
 export class Todos extends React.PureComponent<TodosProps, TodosState> {
   state: TodosState = {
     todos: [],
     newTodoName: '',
-    loadingTodos: true
+    loadingTodos: true,
+    searchTodo: ''
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newTodoName: event.target.value })
+  }
+
+  handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ searchTodo: event.target.value })
   }
 
   onEditButtonClick = (todoId: string) => {
@@ -64,10 +78,35 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     try {
       await deleteTodo(this.props.auth.getIdToken(), todoId)
       this.setState({
-        todos: this.state.todos.filter(todo => todo.todoId !== todoId)
+        todos: this.state.todos.filter((todo) => todo.todoId !== todoId)
       })
     } catch {
       alert('Todo deletion failed')
+    }
+  }
+
+  onTodoSearch = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+    try {
+      const searchTodo = this.state.searchTodo
+      console.log('Search todo with keyword: ', searchTodo)
+
+      if (searchTodo) {
+        console.log('Enter search todo')
+        const searchReq: SearchTodoRequest = { keyword: searchTodo }
+
+        const todos = await searchTodos(this.props.auth.getIdToken(), searchReq)
+        this.setState({
+          todos: todos,
+          loadingTodos: false
+        })
+      } else {
+        console.log('Empty search. Enter fetch todo')
+        this.componentDidMount()
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        alert(`Failed to fetch todo: ${e.message}`)
+      }
     }
   }
 
@@ -107,6 +146,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         <Header as="h1">TODOs</Header>
 
         {this.renderCreateTodoInput()}
+
+        {this.renderTodoSearch()}
 
         {this.renderTodos()}
       </div>
@@ -156,18 +197,37 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
+  renderTodoSearch() {
+    return (
+      <Grid.Row>
+        <Grid.Column width={16}>
+          <Input
+            action={{
+              color: 'teal',
+              labelPosition: 'left',
+              icon: 'search',
+              content: 'Search task',
+              onClick: this.onTodoSearch
+            }}
+            fluid
+            actionPosition="left"
+            placeholder="To find what you want..."
+            onChange={this.handleSearch}
+          />
+        </Grid.Column>
+        <Grid.Column width={16}>
+          <Divider />
+        </Grid.Column>
+      </Grid.Row>
+    )
+  }
+
   renderTodosList() {
     return (
       <Grid padded>
         {this.state.todos.map((todo, pos) => {
           return (
             <Grid.Row key={todo.todoId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => this.onTodoCheck(pos)}
-                  checked={todo.done}
-                />
-              </Grid.Column>
               <Grid.Column width={10} verticalAlign="middle">
                 {todo.name}
               </Grid.Column>
